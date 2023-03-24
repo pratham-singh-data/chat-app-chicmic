@@ -6,8 +6,8 @@ const { generateLocalSendResponse,
 const { findOneInUsers,
     saveDocumentInUsers,
     saveDocumentInTokens,
-    findManyFromUsers,
-    updateUserById, } = require('../services');
+    updateUserById,
+    runAggregateOnUsers, } = require('../services');
 const { TOKENEXPIRYTIME, TOKENTYPES, } = require('../util/constants');
 const { EMAILALREADYREGISTERED,
     USERSUCCESSFULLYREGISTERRED,
@@ -118,10 +118,29 @@ async function listUsers(req, res, next) {
     try {
         sendResponse(res, {
             statusCode: 200,
-            data: await findManyFromUsers({}, {
-                _id: true,
-                name: true,
-            }),
+            data: await runAggregateOnUsers([
+                {
+                    $skip: req.query.skip,
+                },
+
+                {
+                    $limit: req.query.limit,
+                },
+
+                {
+                    $match: {
+                        _id: {
+                            $ne: req.headers.token.id,
+                        },
+                    },
+                },
+
+                {
+                    $project: {
+                        name: true,
+                    },
+                },
+            ]),
         });
     } catch (err) {
         next(err);
