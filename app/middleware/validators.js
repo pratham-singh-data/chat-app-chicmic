@@ -46,8 +46,16 @@ function validateQuery(schema) {
     return validator(`query`, schema);
 }
 
+/** validates params of request
+ * @param {Object} schema Joi validation schema
+ * @return {Function} Middleware function that validates via given schema
+ */
+function validateParams(schema) {
+    return validator(`params`, schema);
+}
 
 module.exports = {
     validateBody,
     validateQuery,
+    validateParams,
 };

@@ -1,7 +1,11 @@
-const { Schema, Types: { ObjectId, }, } = require('mongoose');
+const { Schema, Types: { ObjectId, }, model, } = require('mongoose');
 
 const messageSchema = new Schema({
     sender: {
+        type: ObjectId,
+        required: true,
+    },
+    chatroom: {
         type: ObjectId,
         required: true,
     },
@@ -13,6 +17,8 @@ const messageSchema = new Schema({
     timestamps: true,
 });
 
+const MessageModel = model(`messages`, messageSchema);
+
 module.exports = {
-    messageSchema,
+    MessageModel,
 };

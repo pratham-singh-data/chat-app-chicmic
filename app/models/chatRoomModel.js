@@ -1,5 +1,4 @@
 const { Schema, Types: { ObjectId, }, model, } = require('mongoose');
-const { messageSchema, } = require('./schemas/messageSchema');
 
 const chatRoomSchema = new Schema({
     participant1: {
@@ -10,7 +9,7 @@ const chatRoomSchema = new Schema({
         type: ObjectId,
         required: true,
     },
-    messages: [ messageSchema, ],
+    messages: [ ObjectId, ],
 });
 
 const ChatroomModel = model(`chatrooms`, chatRoomSchema);
