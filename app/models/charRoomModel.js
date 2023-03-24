@@ -13,8 +13,8 @@ const chatRoomSchema = new Schema({
     messages: [ messageSchema, ],
 });
 
-const chatRoomModel = model(`chatRoomsSchema`, chatRoomSchema);
+const ChatroomModel = model(`chatrooms`, chatRoomSchema);
 
 module.exports = {
-    chatRoomModel,
+    ChatroomModel,
 };

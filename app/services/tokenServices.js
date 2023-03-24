@@ -1,4 +1,4 @@
-const { TokenModel, } = require('../models/tokenModel');
+const { TokenModel, } = require('../models');
 const { saveDocument, findOne, } = require('./operators/serviceOperators');
 
 /** Saves a document in users model

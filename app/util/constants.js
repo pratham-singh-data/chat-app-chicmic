@@ -1,4 +1,5 @@
 module.exports = {
+    OBJECTIDREGEX: /^[0-9a-fA-F]{24}$/,
     STRINGLENGTHMIN: 0,
     STRINGLENGTHMAX: {
         NORMAL: 1000,
