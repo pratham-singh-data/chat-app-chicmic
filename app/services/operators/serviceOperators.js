@@ -35,9 +35,21 @@ async function findOne(model, searchQuery, projectionQuery) {
     return await model.findOne(searchQuery, projectionQuery).exec();
 }
 
+/** updates id element from given model
+ * @param {Model} model Mongoose compiled model
+ * @param {String} id id of element to update
+ * @param {Object} updateQuery update query for collection
+ */
+async function updateById(model, id, updateQuery) {
+    await model.updateOne({
+        _id: id,
+    }, updateQuery).exec();
+}
+
 module.exports = {
     saveDocument,
     findById,
     findMany,
     findOne,
+    updateById,
 };

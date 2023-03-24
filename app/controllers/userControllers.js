@@ -6,7 +6,8 @@ const { generateLocalSendResponse,
 const { findOneInUsers,
     saveDocumentInUsers,
     saveDocumentInTokens,
-    findManyFromUsers, } = require('../services');
+    findManyFromUsers,
+    updateUserById, } = require('../services');
 const { TOKENEXPIRYTIME, TOKENTYPES, } = require('../util/constants');
 const { EMAILALREADYREGISTERED,
     USERSUCCESSFULLYREGISTERRED,
@@ -41,13 +42,13 @@ async function signupUser(req, res, next) {
         const token = sign({
             id: savedData._id,
         }, SECRETKEY, {
-            expiresIn: TOKENEXPIRYTIME.LOGIN,
+            expiresIn: TOKENEXPIRYTIME.TEMP,
         });
 
         await saveDocumentInTokens({
             user: savedData._id,
             token,
-            tokenType: TOKENTYPES.LOGIN,
+            tokenType: TOKENTYPES.TEMP,
         });
 
         localResponder({
@@ -72,7 +73,10 @@ async function loginUser(req, res, next) {
     body.password = hashPassword(body.password);
 
     try {
-        const userData = await findOneInUsers(body);
+        const userData = await findOneInUsers({
+            ...body,
+            emailValidated: true,
+        });
 
         if (! userData) {
             localResponder({
@@ -124,8 +128,59 @@ async function listUsers(req, res, next) {
     }
 }
 
+/** Validates a user's email
+ * @param {Request} req Express request object
+ * @param {Response} res Express response object
+ * @param {Function} next Express next function
+ */
+async function validateUserEmail(req, res, next) {
+    const localResponder = generateLocalSendResponse(res);
+    const body = req.body;
+    body.password = hashPassword(body.password);
+
+    try {
+        const userData = await findOneInUsers(body);
+
+        if (! userData) {
+            localResponder({
+                statusCode: 400,
+                message: CREDENTIALSNOTVEFIFIED,
+            });
+
+            return;
+        }
+
+        const token = sign({
+            id: userData._id,
+        }, SECRETKEY, {
+            expiresIn: TOKENEXPIRYTIME.LOGIN,
+        });
+
+        await updateUserById(userData._id, {
+            $set: {
+                emailValidated: true,
+            },
+        });
+
+        await saveDocumentInTokens({
+            user: userData._id,
+            token,
+            tokenType: TOKENTYPES.LOGIN,
+        });
+
+        localResponder({
+            statusCode: 200,
+            message: USERSUCCESSFULLOGIN,
+            token,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
 module.exports = {
     signupUser,
     loginUser,
     listUsers,
+    validateUserEmail,
 };
