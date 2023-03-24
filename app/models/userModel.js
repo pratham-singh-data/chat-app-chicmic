@@ -9,6 +9,10 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
+    emailValidated: {
+        type: Boolean,
+        default: false,
+    },
     password: {
         type: String,
         required: true,
@@ -21,8 +25,8 @@ const userSchema = new Schema({
     timestamps: true,
 });
 
-const userModel = model(`users`, userSchema);
+const UserModel = model(`users`, userSchema);
 
 module.exports = {
-    userModel,
+    UserModel,
 };

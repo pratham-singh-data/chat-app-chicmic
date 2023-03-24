@@ -3,4 +3,6 @@ module.exports = {
     USERSUCCESSFULLYREGISTERRED: `User successfully registered`,
     USERSUCCESSFULLOGIN: `User successfully logged in.`,
     CREDENTIALSNOTVEFIFIED: `Credentials could not be verified.`,
+    INVALIDTOKEN: `A valid token is needed.`,
+    NONEXISTENTUSER: `This user does not exist.`,
 };

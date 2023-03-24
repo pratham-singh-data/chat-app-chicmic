@@ -1,10 +1,12 @@
 const { sign, } = require('jsonwebtoken');
 const { SECRETKEY, } = require('../../config');
 const { hashPassword, } = require('../helpers/hashPassword');
-const { generateLocalSendResponse, } = require('../helpers/responder');
+const { generateLocalSendResponse,
+    sendResponse, } = require('../helpers/responder');
 const { findOneInUsers,
     saveDocumentInUsers,
-    saveDocumentInTokens, } = require('../services');
+    saveDocumentInTokens,
+    findManyFromUsers, } = require('../services');
 const { TOKENEXPIRYTIME, TOKENTYPES, } = require('../util/constants');
 const { EMAILALREADYREGISTERED,
     USERSUCCESSFULLYREGISTERRED,
@@ -55,7 +57,7 @@ async function signupUser(req, res, next) {
             savedData,
         });
     } catch (err) {
-        next(new Error(err.message));
+        next(err);
     }
 }
 
@@ -99,11 +101,31 @@ async function loginUser(req, res, next) {
             token,
         });
     } catch (err) {
-        next(new Error(err.message));
+        next(err);
+    }
+}
+
+/** Function to list all existing users in the database
+ * @param {Request} req Express request object
+ * @param {Response} res Express response object
+ * @param {Function} next Express next function
+ */
+async function listUsers(req, res, next) {
+    try {
+        sendResponse(res, {
+            statusCode: 200,
+            data: await findManyFromUsers({}, {
+                _id: true,
+                name: true,
+            }),
+        });
+    } catch (err) {
+        next(err);
     }
 }
 
 module.exports = {
     signupUser,
     loginUser,
+    listUsers,
 };
