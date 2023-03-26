@@ -15,6 +15,16 @@ async function saveDocument(model, doc) {
     return await model(doc).save();
 };
 
+/** executes searchQuery on given model
+ * @param {Model} model Mongoose compiled model
+ * @param {Object} searchQuery search query to execute on collection
+ * @param {Object} projectionQuery projection query to execute on collection
+ * @return {Object} data from database
+ */
+async function find(model, searchQuery, projectionQuery) {
+    return await model.find(searchQuery, projectionQuery).exec();
+}
+
 /** finds id element from given model
  * @param {Model} model Mongoose compiled model
  * @param {String} id id of element to find
@@ -51,4 +61,5 @@ module.exports = {
     findById,
     findOne,
     updateById,
+    find,
 };

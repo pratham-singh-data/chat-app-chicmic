@@ -2,7 +2,8 @@ const { generateLocalSendResponse, } = require('../helpers/responder');
 const { saveDocumentInChatrooms,
     saveDocumentInMessages,
     findFromChatroomsById,
-    updateChatroomById, } = require('../services');
+    updateChatroomById,
+    findInMessages, } = require('../services');
 const { findFromUsersById, } = require('../services/userServices');
 const { NONEXISTENTUSER,
     DATASUCCESSFULLYCREATED,
@@ -115,7 +116,28 @@ async function sendMessage(req, res, next) {
     }
 }
 
+/** List messages in a chatroom; id from params
+ * @param {Request} req Express request object\
+ * @param {Response} res Express response object
+ * @param {Function} next Express next function
+ */
+async function listMessage(req, res, next) {
+    try {
+        const data = await findInMessages({
+            chatroom: req.params.id,
+        });
+
+        sendMessage(res, {
+            statusCode: 200,
+            data,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
 module.exports = {
     registerRoom,
     sendMessage,
+    listMessage,
 };

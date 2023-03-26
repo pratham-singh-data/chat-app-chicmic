@@ -21,6 +21,11 @@ chatroomRouter.post(`/sendMessage/:id`,
     validateParams(soleIdSchema),
     sendMessage);
 
+chatroomRouter.post(`/messages/:id`,
+    checkToken(TOKENTYPES.LOGIN),
+    validateParams(soleIdSchema),
+    sendMessage);
+
 module.exports = {
     chatroomRouter,
 };
