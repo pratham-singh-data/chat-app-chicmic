@@ -140,8 +140,9 @@ async function updateMessage(req, res, next) {
     try {
         // get data of message
         const messageData = await findFromMessagesById(req.params.id);
+
         if (! messageData) {
-            localResponder(res, {
+            localResponder({
                 statusCode: 404,
                 message: NONEXISTENTMESSAGE,
             });
@@ -150,6 +151,8 @@ async function updateMessage(req, res, next) {
         }
 
         // if current user is not the sender then do not update
+        // eslint-disable-next-line max-len
+        console.log(messageData, String(messageData.sender), token.id, String(messageData.sender) !== token.id);
         if (String(messageData.sender) !== token.id) {
             localResponder(res, {
                 statusCode: 403,
@@ -166,20 +169,20 @@ async function updateMessage(req, res, next) {
         });
 
         // send data to socket
-        const socket = io(`http://localhost:${PORT}`);
-        socket.emit(`updated_message`,
-            {
-                id: req.params.id,
-                message: body.message,
-            },
-            messageData.chatroom);
+        // const socket = io(`http://localhost:${PORT}`);
+        // socket.emit(`updated_message`,
+        //     {
+        //         id: req.params.id,
+        //         message: body.message,
+        //     },
+        //     messageData.chatroom);
 
-        localResponder({
+        return localResponder({
             statusCode: 200,
             message: DATASUCCESSFULLYUPDATED,
         });
     } catch (err) {
-        next(err);
+        return next(err);
     }
 }
 
