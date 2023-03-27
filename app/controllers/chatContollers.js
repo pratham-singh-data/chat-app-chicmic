@@ -107,7 +107,7 @@ async function sendMessage(req, res, next) {
         const savedData = await saveDocumentInMessages(body);
 
         // send data to socket
-        const socket = io(`http://localhost:${PORT}/${savedData.chatroom}`);
+        const socket = io(`http://localhost:${PORT}`);
         socket.emit(`simple_message`, savedData.text, savedData.chatroom);
 
         // register in chatroom
