@@ -6,8 +6,11 @@ module.exports = {
     INVALIDTOKEN: `A valid token is needed.`,
     NONEXISTENTUSER: `This user does not exist.`,
     NONEXISTENTCHATROOM: `This chatroom does not exist.`,
+    NONEXISTENTMESSAGE: `This message does not exist.`,
     NONEXISTENTENDPOINT: `This endpoint does not exist.`,
     DATASUCCESSFULLYCREATED: `Data successfully created`,
+    DATASUCCESSFULLYUPDATED: `Data successfully updated`,
     PARTNERCANNOTBESELF: `Partner cannot be self.`,
     NONPARTICIPANTUSER: `You are not a participant in this chatroom.`,
+    MESSAGEDOESNOTBELONG: `Given message does not belong to the current user.`,
 };

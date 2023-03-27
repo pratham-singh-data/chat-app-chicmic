@@ -5,13 +5,18 @@ const { saveDocumentInChatrooms,
     saveDocumentInMessages,
     findFromChatroomsById,
     updateChatroomById,
-    findInMessages, } = require('../services');
+    findInMessages,
+    findFromMessagesById,
+    updateMessagesById, } = require('../services');
 const { findFromUsersById, } = require('../services/userServices');
 const { NONEXISTENTUSER,
     DATASUCCESSFULLYCREATED,
     PARTNERCANNOTBESELF,
     NONPARTICIPANTUSER,
-    NONEXISTENTCHATROOM, } = require('../util/messages');
+    NONEXISTENTCHATROOM,
+    NONEXISTENTMESSAGE,
+    MESSAGEDOESNOTBELONG,
+    DATASUCCESSFULLYUPDATED, } = require('../util/messages');
 
 /** Registers a chatroom
  * @param {Request} req Express request object\
@@ -122,6 +127,57 @@ async function sendMessage(req, res, next) {
     }
 }
 
+/** Updates message in a chatroom
+ * @param {Request} req Express request object\
+ * @param {Response} res Express response object
+ * @param {Function} next Express next function
+ */
+async function updateMessage(req, res, next) {
+    const localResponder = generateLocalSendResponse(res);
+    const token = req.headers.token;
+    const body = req.body;
+
+    try {
+        // get data of message
+        const messageData = await findFromMessagesById(req.params.id);
+        if (! messageData) {
+            localResponder(res, {
+                statusCode: 404,
+                message: NONEXISTENTMESSAGE,
+            });
+
+            return;
+        }
+
+        // if current user is not the sender then do not update
+        if (String(messageData.sender) !== token.id) {
+            localResponder(res, {
+                statusCode: 403,
+                message: MESSAGEDOESNOTBELONG,
+            });
+
+            return;
+        }
+
+        updateMessagesById(req.params.id, {
+            $set: {
+                text: body.message,
+            },
+        });
+
+        // send data to socket
+        const socket = io(`http://localhost:${PORT}/${req.params.id}`);
+        socket.emit(`updated_message`, body.message, req.params.id);
+
+        localResponder({
+            statusCode: 200,
+            message: DATASUCCESSFULLYUPDATED,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
 /** List messages in a chatroom; id from params
  * @param {Request} req Express request object\
  * @param {Response} res Express response object
@@ -146,4 +202,5 @@ module.exports = {
     registerRoom,
     sendMessage,
     listMessage,
+    updateMessage,
 };
