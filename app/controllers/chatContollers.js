@@ -166,8 +166,13 @@ async function updateMessage(req, res, next) {
         });
 
         // send data to socket
-        const socket = io(`http://localhost:${PORT}/${req.params.id}`);
-        socket.emit(`updated_message`, body.message, req.params.id);
+        const socket = io(`http://localhost:${PORT}`);
+        socket.emit(`updated_message`,
+            {
+                id: req.params.id,
+                message: body.message,
+            },
+            messageData.chatroom);
 
         localResponder({
             statusCode: 200,
