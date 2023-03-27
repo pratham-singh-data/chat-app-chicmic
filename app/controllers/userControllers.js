@@ -236,10 +236,30 @@ async function updateUser(req, res, next) {
 async function validateUserEmail(req, res, next) {
     const localResponder = generateLocalSendResponse(res);
     const body = req.body;
+    const token = req.headers.token;
     body.password = hashPassword(body.password);
 
     try {
-        const userData = await findOneInUsers(body);
+        let userData;
+
+        if (token.oldEmail) {
+            if (body.email !== token.email) {
+                localResponder({
+                    statusCode: 403,
+                    message: CREDENTIALSNOTVEFIFIED,
+                });
+
+                return;
+            }
+
+            // update email token
+            userData = await findOneInUsers({
+                email: token.oldEmail,
+                password: body.password,
+            });
+        } else {
+            userData = await findOneInUsers(body);
+        }
 
         if (! userData) {
             localResponder({
@@ -250,28 +270,37 @@ async function validateUserEmail(req, res, next) {
             return;
         }
 
-        const token = sign({
+        const jwtToken = sign({
             id: userData._id,
         }, SECRETKEY, {
             expiresIn: TOKENEXPIRYTIME.LOGIN,
         });
 
-        await updateUserById(userData._id, {
-            $set: {
-                emailValidated: true,
-            },
-        });
+        if (! token.oldEmail) {
+            await updateUserById(userData._id, {
+                $set: {
+                    emailValidated: true,
+                },
+            });
+        } else {
+            await updateUserById(userData._id, {
+                $set: {
+                    email: token.email,
+                    emailValidated: true,
+                },
+            });
+        }
 
         await saveDocumentInTokens({
             user: userData._id,
-            token,
+            token: jwtToken,
             tokenType: TOKENTYPES.LOGIN,
         });
 
         localResponder({
             statusCode: 200,
             message: USERSUCCESSFULLOGIN,
-            token,
+            token: jwtToken,
         });
     } catch (err) {
         next(err);
