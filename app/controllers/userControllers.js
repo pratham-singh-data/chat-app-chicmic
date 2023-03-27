@@ -7,12 +7,14 @@ const { findOneInUsers,
     saveDocumentInUsers,
     saveDocumentInTokens,
     updateUserById,
-    runAggregateOnUsers, } = require('../services');
+    runAggregateOnUsers,
+    findFromUsersById, } = require('../services');
 const { TOKENEXPIRYTIME, TOKENTYPES, } = require('../util/constants');
 const { EMAILALREADYREGISTERED,
     USERSUCCESSFULLYREGISTERRED,
     CREDENTIALSNOTVEFIFIED,
-    USERSUCCESSFULLOGIN, } = require('../util/messages');
+    USERSUCCESSFULLOGIN,
+    DATASUCCESSFULLYUPDATED, } = require('../util/messages');
 
 /** Signs up new user in database
  * @param {Request} req Express request object
@@ -147,6 +149,85 @@ async function listUsers(req, res, next) {
     }
 }
 
+/** Updates user data
+ * @param {Request} req Express request object
+ * @param {Response} res Express response object
+ * @param {Function} next Express next function
+ */
+async function updateUser(req, res, next) {
+    const localResponder = generateLocalSendResponse(res);
+    const token = req.headers.token;
+    const body = req.body;
+
+    try {
+        // get data of current user
+        const userData = await findFromUsersById(token.id);
+
+        // check if user is trying to update email
+        if (userData.email !== body.email) {
+            // check that email is unique
+            if (await findOneInUsers({
+                email: body.email,
+            })) {
+                localResponder({
+                    statusCode: 403,
+                    message: EMAILALREADYREGISTERED,
+                });
+
+                return;
+            }
+
+            // create and send a temp token
+            const jwtToken = sign({
+                id: token.id,
+                email: body.email,
+                oldEmail: userData.email,
+            }, SECRETKEY, {
+                expiresIn: TOKENEXPIRYTIME.TEMP,
+            });
+
+            // remove email from data being updated
+            delete body.email;
+
+            // update user data but also mark email as not validated
+            await updateUserById(token.id, {
+                $set: {
+                    ...body,
+                    password: hashPassword(body.password),
+                },
+            });
+
+            await saveDocumentInTokens({
+                user: token.id,
+                token: jwtToken,
+                tokenType: TOKENTYPES.TEMP,
+            });
+
+            localResponder({
+                statusCode: 200,
+                message: DATASUCCESSFULLYUPDATED,
+                token: jwtToken,
+            });
+        } else {
+            await updateUserById(token.id, {
+                $set: {
+                    ...body,
+                    password: hashPassword(body.password),
+                },
+            });
+
+            localResponder({
+                statusCode: 200,
+                message: DATASUCCESSFULLYUPDATED,
+            });
+        }
+
+        // will never reach here
+    } catch (err) {
+        next(new Error(err));
+    }
+}
+
 /** Validates a user's email
  * @param {Request} req Express request object
  * @param {Response} res Express response object
@@ -202,4 +283,5 @@ module.exports = {
     loginUser,
     listUsers,
     validateUserEmail,
+    updateUser,
 };

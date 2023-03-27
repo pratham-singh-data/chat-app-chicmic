@@ -2,7 +2,8 @@ const { Router, } = require('express');
 const { signupUser,
     loginUser,
     listUsers,
-    validateUserEmail, } = require('../controllers/userControllers');
+    validateUserEmail,
+    updateUser, } = require('../controllers/userControllers');
 const { checkToken, } = require('../helpers/checkToken');
 const { validateBody, validateQuery, } = require('../middleware/validators');
 const { TOKENTYPES, } = require('../util/constants');
@@ -15,6 +16,11 @@ const userRouter = Router();
 
 userRouter.post(`/signup`, validateBody(signupSchema), signupUser);
 userRouter.post(`/login`, validateBody(loginSchema), loginUser);
+
+userRouter.put(`/update`,
+    checkToken(TOKENTYPES.LOGIN),
+    validateBody(signupSchema),
+    updateUser);
 
 userRouter.patch(`/validate`,
     checkToken(TOKENTYPES.TEMP),
