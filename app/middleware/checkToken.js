@@ -53,10 +53,8 @@ function checkToken(...types) {
             return;
         }
 
-        let id;
-
         try {
-            ({ id, } = verify(req.headers.token, SECRETKEY));
+            req.headers.token = verify(req.headers.token, SECRETKEY);
         } catch (err) {
             localResponder({
                 statusCode: 403,
@@ -67,7 +65,7 @@ function checkToken(...types) {
         }
 
         // confirm a corresponding user exists
-        const userData = await findFromUsersById(id);
+        const userData = await findFromUsersById(req.headers.token.id);
 
         if (! userData) {
             localResponder({

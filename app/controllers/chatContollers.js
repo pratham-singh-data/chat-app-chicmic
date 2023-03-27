@@ -1,3 +1,5 @@
+const { io, } = require('socket.io-client');
+const { PORT, } = require('../../config');
 const { generateLocalSendResponse, } = require('../helpers/responder');
 const { saveDocumentInChatrooms,
     saveDocumentInMessages,
@@ -98,6 +100,10 @@ async function sendMessage(req, res, next) {
         delete body.message;
 
         const savedData = await saveDocumentInMessages(body);
+
+        // send data to socket
+        const socket = io(`http://localhost:${PORT}/${savedData.chatroom}`);
+        socket.emit(`simple_message`, savedData.text, savedData.chatroom);
 
         // register in chatroom
         updateChatroomById(req.params.id, {

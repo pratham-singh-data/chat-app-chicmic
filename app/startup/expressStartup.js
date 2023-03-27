@@ -1,4 +1,5 @@
 const { json, } = require('express');
+const { notFound, } = require('../controllers/notFoundController');
 const { handleError, } = require('../middleware/handleError');
 const { userRouter,
     chatroomRouter, } = require('../routes');
@@ -12,7 +13,7 @@ function expressStartup(app) {
     app.use(`/user`, userRouter);
     app.use(`/chat`, chatroomRouter);
 
-    app.use(handleError);
+    app.use(notFound, handleError);
 }
 
 module.exports = {
