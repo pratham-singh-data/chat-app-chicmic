@@ -3,7 +3,7 @@
  * @param {Data} data Data to send in response
  */
 function sendResponse(res, data) {
-    res.status(data.statusCode);
+    res.status(data.statusCode ?? 200);
     res.json(data);
 }
 
