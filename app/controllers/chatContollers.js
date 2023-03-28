@@ -151,10 +151,8 @@ async function updateMessage(req, res, next) {
         }
 
         // if current user is not the sender then do not update
-        // eslint-disable-next-line max-len
-        console.log(messageData, String(messageData.sender), token.id, String(messageData.sender) !== token.id);
         if (String(messageData.sender) !== token.id) {
-            localResponder(res, {
+            localResponder({
                 statusCode: 403,
                 message: MESSAGEDOESNOTBELONG,
             });
@@ -169,13 +167,13 @@ async function updateMessage(req, res, next) {
         });
 
         // send data to socket
-        // const socket = io(`http://localhost:${PORT}`);
-        // socket.emit(`updated_message`,
-        //     {
-        //         id: req.params.id,
-        //         message: body.message,
-        //     },
-        //     messageData.chatroom);
+        const socket = io(`http://localhost:${PORT}`);
+        socket.emit(`updated_message`,
+            {
+                id: req.params.id,
+                message: body.message,
+            },
+            messageData.chatroom);
 
         return localResponder({
             statusCode: 200,
