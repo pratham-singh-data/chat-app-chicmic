@@ -4,4 +4,5 @@ module.exports = {
     SECRETKEY: process.env.SECRETKEY,
     MONGOURL: process.env.MONGOURL,
     HITLOGFILEURL: `./database/logs/hits.log`,
+    ERRORLOGGERDIRECTORYURL: `./database/logs/errors`,
 };
