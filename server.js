@@ -6,6 +6,7 @@ const { expressStartup, } = require('./app/startup/expressStartup');
 const { mongoConnect, } = require('./app/startup/mongoStartup');
 const { socketStartup, } = require('./app/startup/socketStartup');
 const { loggingErrorHandler, } = require('./app/util/loggingErrorHandler');
+const { PORT, } = require('./config');
 
 const app = express();
 const httpServer = createServer(app);
@@ -19,8 +20,8 @@ async function startupActivites() {
 }
 
 startupActivites().then(() => {
-    httpServer.listen(process.env.PORT, () => {
-        console.log(`Server started on port ${process.env.PORT}`);
+    httpServer.listen(PORT, () => {
+        console.log(`Server started on port ${PORT}`);
     });
 });
 

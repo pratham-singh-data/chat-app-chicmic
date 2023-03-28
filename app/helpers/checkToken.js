@@ -1,7 +1,7 @@
 const { verify, } = require('jsonwebtoken');
 const { SECRETKEY, } = require('../../config');
 const { findOneInTokens, findFromUsersById, } = require('../services');
-const { INVALIDTOKEN, NONEXISTENTUSER, } = require('../util/messages');
+const { INVALID_TOKEN, NON_EXISTENT_USER, } = require('../util/messages');
 const { generateLocalSendResponse, } = require('./responder');
 
 /** Checks the token in response
@@ -20,7 +20,7 @@ function checkToken(...types) {
         if (! req.headers.token) {
             localResponder({
                 statusCode: 400,
-                messsage: INVALIDTOKEN,
+                messsage: INVALID_TOKEN,
             });
 
             return;
@@ -34,7 +34,7 @@ function checkToken(...types) {
         if (! tokenData) {
             localResponder({
                 statusCode: 400,
-                message: INVALIDTOKEN,
+                message: INVALID_TOKEN,
             });
 
             return;
@@ -44,7 +44,7 @@ function checkToken(...types) {
         if (! types.includes(tokenData.tokenType)) {
             localResponder({
                 statusCode: 400,
-                message: INVALIDTOKEN,
+                message: INVALID_TOKEN,
             });
 
             return;
@@ -56,7 +56,7 @@ function checkToken(...types) {
         } catch (err) {
             localResponder({
                 statusCode: 400,
-                message: INVALIDTOKEN,
+                message: INVALID_TOKEN,
             });
 
             return;
@@ -66,7 +66,7 @@ function checkToken(...types) {
         if (! await findFromUsersById(req.headers.token.id)) {
             localResponder({
                 statusCode: 400,
-                message: NONEXISTENTUSER,
+                message: NON_EXISTENT_USER,
             });
 
             return;

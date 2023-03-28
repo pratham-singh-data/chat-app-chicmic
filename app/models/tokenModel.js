@@ -1,5 +1,5 @@
 const { Schema, Types: { ObjectId, }, model, } = require('mongoose');
-const { TOKENTYPES, } = require('../util/constants');
+const { TOKEN_TYPES, } = require('../util/constants');
 
 const tokenSchema = new Schema({
     user: {
@@ -12,7 +12,7 @@ const tokenSchema = new Schema({
     },
     tokenType: {
         type: Number,
-        default: TOKENTYPES.TEMP,
+        default: TOKEN_TYPES.TEMP,
     },
 }, {
     timestamps: true,

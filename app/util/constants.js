@@ -1,14 +1,14 @@
 module.exports = {
-    OBJECTIDREGEX: /^[0-9a-fA-F]{24}$/,
-    STRINGLENGTHMIN: 0,
-    STRINGLENGTHMAX: {
+    OBJECTID_REGEX: /^[0-9a-fA-F]{24}$/,
+    STRING_LENGTH_MIN: 0,
+    STRING_LENGTH_MAX: {
         NORMAL: 1000,
     },
-    TOKENTYPES: {
+    TOKEN_TYPES: {
         TEMP: 0,
         LOGIN: 1,
     },
-    TOKENEXPIRYTIME: {
+    TOKEN_EXPIRY_TIME: {
         TEMP: 1800, // 30 * 60; 30 minutes
         LOGIN: 31536000, // 365 * 24 * 60 * 60; 1 year
     },

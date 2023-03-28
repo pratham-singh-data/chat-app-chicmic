@@ -9,12 +9,12 @@ const { findOneInUsers,
     updateUserById,
     runAggregateOnUsers,
     findFromUsersById, } = require('../services');
-const { TOKENEXPIRYTIME, TOKENTYPES, } = require('../util/constants');
-const { EMAILALREADYREGISTERED,
-    USERSUCCESSFULLYREGISTERRED,
-    CREDENTIALSNOTVEFIFIED,
-    USERSUCCESSFULLOGIN,
-    DATASUCCESSFULLYUPDATED, } = require('../util/messages');
+const { TOKEN_EXPIRY_TIME, TOKEN_TYPES, } = require('../util/constants');
+const { EMAIL_ALREADY_REGISTERED,
+    USER_SUCCESSFULLY_REGISTERRED,
+    CREDENTIALS_NOT_VEFIFIED,
+    USER_SUCCESSFUL_LOGIN,
+    DATA_SUCCESSFULLY_UPDATED, } = require('../util/messages');
 
 /** Signs up new user in database
  * @param {Request} req Express request object
@@ -33,7 +33,7 @@ async function signupUser(req, res, next) {
         })) {
             localResponder({
                 statusCode: 403,
-                message: EMAILALREADYREGISTERED,
+                message: EMAIL_ALREADY_REGISTERED,
             });
 
             return;
@@ -44,18 +44,18 @@ async function signupUser(req, res, next) {
         const token = sign({
             id: savedData._id,
         }, SECRETKEY, {
-            expiresIn: TOKENEXPIRYTIME.TEMP,
+            expiresIn: TOKEN_EXPIRY_TIME.TEMP,
         });
 
         await saveDocumentInTokens({
             user: savedData._id,
             token,
-            tokenType: TOKENTYPES.TEMP,
+            tokenType: TOKEN_TYPES.TEMP,
         });
 
         localResponder({
             statusCode: 201,
-            message: USERSUCCESSFULLYREGISTERRED,
+            message: USER_SUCCESSFULLY_REGISTERRED,
             token,
             savedData,
         });
@@ -83,7 +83,7 @@ async function loginUser(req, res, next) {
         if (! userData) {
             localResponder({
                 statusCode: 400,
-                message: CREDENTIALSNOTVEFIFIED,
+                message: CREDENTIALS_NOT_VEFIFIED,
             });
 
             return;
@@ -92,18 +92,18 @@ async function loginUser(req, res, next) {
         const token = sign({
             id: userData._id,
         }, SECRETKEY, {
-            expiresIn: TOKENEXPIRYTIME.LOGIN,
+            expiresIn: TOKEN_EXPIRY_TIME.LOGIN,
         });
 
         await saveDocumentInTokens({
             user: userData._id,
             token,
-            tokenType: TOKENTYPES.LOGIN,
+            tokenType: TOKEN_TYPES.LOGIN,
         });
 
         localResponder({
             statusCode: 200,
-            message: USERSUCCESSFULLOGIN,
+            message: USER_SUCCESSFUL_LOGIN,
             token,
         });
     } catch (err) {
@@ -171,7 +171,7 @@ async function updateUser(req, res, next) {
             })) {
                 localResponder({
                     statusCode: 403,
-                    message: EMAILALREADYREGISTERED,
+                    message: EMAIL_ALREADY_REGISTERED,
                 });
 
                 return;
@@ -183,7 +183,7 @@ async function updateUser(req, res, next) {
                 email: body.email,
                 oldEmail: userData.email,
             }, SECRETKEY, {
-                expiresIn: TOKENEXPIRYTIME.TEMP,
+                expiresIn: TOKEN_EXPIRY_TIME.TEMP,
             });
 
             // remove email from data being updated
@@ -200,12 +200,12 @@ async function updateUser(req, res, next) {
             await saveDocumentInTokens({
                 user: token.id,
                 token: jwtToken,
-                tokenType: TOKENTYPES.TEMP,
+                tokenType: TOKEN_TYPES.TEMP,
             });
 
             localResponder({
                 statusCode: 200,
-                message: DATASUCCESSFULLYUPDATED,
+                message: DATA_SUCCESSFULLY_UPDATED,
                 token: jwtToken,
             });
         } else {
@@ -218,7 +218,7 @@ async function updateUser(req, res, next) {
 
             localResponder({
                 statusCode: 200,
-                message: DATASUCCESSFULLYUPDATED,
+                message: DATA_SUCCESSFULLY_UPDATED,
             });
         }
 
@@ -246,7 +246,7 @@ async function validateUserEmail(req, res, next) {
             if (body.email !== token.email) {
                 localResponder({
                     statusCode: 403,
-                    message: CREDENTIALSNOTVEFIFIED,
+                    message: CREDENTIALS_NOT_VEFIFIED,
                 });
 
                 return;
@@ -264,7 +264,7 @@ async function validateUserEmail(req, res, next) {
         if (! userData) {
             localResponder({
                 statusCode: 400,
-                message: CREDENTIALSNOTVEFIFIED,
+                message: CREDENTIALS_NOT_VEFIFIED,
             });
 
             return;
@@ -273,7 +273,7 @@ async function validateUserEmail(req, res, next) {
         const jwtToken = sign({
             id: userData._id,
         }, SECRETKEY, {
-            expiresIn: TOKENEXPIRYTIME.LOGIN,
+            expiresIn: TOKEN_EXPIRY_TIME.LOGIN,
         });
 
         if (! token.oldEmail) {
@@ -294,12 +294,12 @@ async function validateUserEmail(req, res, next) {
         await saveDocumentInTokens({
             user: userData._id,
             token: jwtToken,
-            tokenType: TOKENTYPES.LOGIN,
+            tokenType: TOKEN_TYPES.LOGIN,
         });
 
         localResponder({
             statusCode: 200,
-            message: USERSUCCESSFULLOGIN,
+            message: USER_SUCCESSFUL_LOGIN,
             token: jwtToken,
         });
     } catch (err) {

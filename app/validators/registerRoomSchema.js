@@ -1,8 +1,8 @@
 const Joi = require('joi');
-const { OBJECTIDREGEX, } = require('../util/constants');
+const { OBJECTID_REGEX, } = require('../util/constants');
 
 const registerRoomSchema = Joi.object({
-    partner: Joi.string().regex(OBJECTIDREGEX).required(),
+    partner: Joi.string().regex(OBJECTID_REGEX).required(),
 });
 
 module.exports = {

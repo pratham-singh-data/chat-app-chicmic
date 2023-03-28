@@ -6,7 +6,7 @@ const { signupUser,
     updateUser, } = require('../controllers/userControllers');
 const { checkToken, } = require('../helpers/checkToken');
 const { validateBody, validateQuery, } = require('../middleware/validators');
-const { TOKENTYPES, } = require('../util/constants');
+const { TOKEN_TYPES, } = require('../util/constants');
 const { signupSchema,
     loginSchema,
     paginationSchema, } = require('../validators');
@@ -18,17 +18,17 @@ userRouter.post(`/signup`, validateBody(signupSchema), signupUser);
 userRouter.post(`/login`, validateBody(loginSchema), loginUser);
 
 userRouter.put(`/update`,
-    checkToken(TOKENTYPES.LOGIN),
+    checkToken(TOKEN_TYPES.LOGIN),
     validateBody(signupSchema),
     updateUser);
 
 userRouter.patch(`/validate`,
-    checkToken(TOKENTYPES.TEMP),
+    checkToken(TOKEN_TYPES.TEMP),
     validateBody(loginSchema),
     validateUserEmail);
 
 userRouter.get(`/list`,
-    checkToken(TOKENTYPES.LOGIN),
+    checkToken(TOKEN_TYPES.LOGIN),
     validateQuery(paginationSchema),
     listUsers);
 

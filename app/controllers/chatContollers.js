@@ -11,15 +11,15 @@ const { saveDocumentInChatrooms,
     updateMessagesById,
     deleteFromMessagesById, } = require('../services');
 const { findFromUsersById, } = require('../services/userServices');
-const { NONEXISTENTUSER,
-    DATASUCCESSFULLYCREATED,
-    PARTNERCANNOTBESELF,
-    NONPARTICIPANTUSER,
-    NONEXISTENTCHATROOM,
-    NONEXISTENTMESSAGE,
-    MESSAGEDOESNOTBELONG,
-    DATASUCCESSFULLYUPDATED,
-    DATASUCCESSFULLYDELETED, } = require('../util/messages');
+const { NON_EXISTENT_USER,
+    DATA_SUCCESSFULLY_CREATED,
+    PARTNER_CANNOT_BE_SELF,
+    NON_PARTICIPANT_USER,
+    NON_EXISTENT_CHATROOM,
+    NON_EXISTENT_MESSAGE,
+    MESSAGE_DOES_NOT_BELONG,
+    DATA_SUCCESSFULLY_UPDATED,
+    DATA_SUCCESSFULLY_DELETED, } = require('../util/messages');
 
 /** Registers a chatroom
  * @param {Request} req Express request object\
@@ -36,7 +36,7 @@ async function registerRoom(req, res, next) {
         if (! await findFromUsersById(body.partner)) {
             localResponder({
                 statusCode: 403,
-                message: NONEXISTENTUSER,
+                message: NON_EXISTENT_USER,
             });
 
             return;
@@ -46,7 +46,7 @@ async function registerRoom(req, res, next) {
         if (body.partner === token.id) {
             localResponder({
                 statusCode: 400,
-                message: PARTNERCANNOTBESELF,
+                message: PARTNER_CANNOT_BE_SELF,
             });
 
             return;
@@ -59,7 +59,7 @@ async function registerRoom(req, res, next) {
 
         localResponder({
             statusCode: 200,
-            message: DATASUCCESSFULLYCREATED,
+            message: DATA_SUCCESSFULLY_CREATED,
             savedData,
         });
     } catch (err) {
@@ -85,7 +85,7 @@ async function sendMessage(req, res, next) {
         if (! chatroomData) {
             localResponder({
                 statusCode: 403,
-                message: NONEXISTENTCHATROOM,
+                message: NON_EXISTENT_CHATROOM,
             });
 
             return;
@@ -95,7 +95,7 @@ async function sendMessage(req, res, next) {
                 String(chatroomData.participant2) !== token.id) {
             localResponder({
                 statusCode: 401,
-                message: NONPARTICIPANTUSER,
+                message: NON_PARTICIPANT_USER,
             });
 
             return;
@@ -122,7 +122,7 @@ async function sendMessage(req, res, next) {
 
         localResponder({
             statusCode: 200,
-            message: DATASUCCESSFULLYCREATED,
+            message: DATA_SUCCESSFULLY_CREATED,
             savedData,
         });
     } catch (err) {
@@ -147,7 +147,7 @@ async function updateMessage(req, res, next) {
         if (! messageData) {
             localResponder({
                 statusCode: 404,
-                message: NONEXISTENTMESSAGE,
+                message: NON_EXISTENT_MESSAGE,
             });
 
             return;
@@ -157,7 +157,7 @@ async function updateMessage(req, res, next) {
         if (String(messageData.sender) !== token.id) {
             localResponder({
                 statusCode: 403,
-                message: MESSAGEDOESNOTBELONG,
+                message: MESSAGE_DOES_NOT_BELONG,
             });
 
             return;
@@ -180,7 +180,7 @@ async function updateMessage(req, res, next) {
 
         return localResponder({
             statusCode: 200,
-            message: DATASUCCESSFULLYUPDATED,
+            message: DATA_SUCCESSFULLY_UPDATED,
         });
     } catch (err) {
         return next(err);
@@ -223,7 +223,7 @@ async function deleteMessage(req, res, next) {
         if (! messageData) {
             localResponder({
                 statusCode: 404,
-                message: NONEXISTENTMESSAGE,
+                message: NON_EXISTENT_MESSAGE,
             });
 
             return;
@@ -233,7 +233,7 @@ async function deleteMessage(req, res, next) {
         if (String(messageData.sender) !== token.id) {
             localResponder({
                 statusCode: 403,
-                message: MESSAGEDOESNOTBELONG,
+                message: MESSAGE_DOES_NOT_BELONG,
             });
 
             return;
@@ -249,7 +249,7 @@ async function deleteMessage(req, res, next) {
 
         return localResponder({
             statusCode: 200,
-            message: DATASUCCESSFULLYDELETED,
+            message: DATA_SUCCESSFULLY_DELETED,
         });
     } catch (err) {
         return next(err);
@@ -273,7 +273,7 @@ async function readChatroom(req, res, next) {
         if (! chatroomData) {
             localResponder({
                 statusCode: 403,
-                message: NONEXISTENTCHATROOM,
+                message: NON_EXISTENT_CHATROOM,
             });
 
             return;
@@ -283,7 +283,7 @@ async function readChatroom(req, res, next) {
                 String(chatroomData.participant2) !== token.id) {
             localResponder({
                 statusCode: 401,
-                message: NONPARTICIPANTUSER,
+                message: NON_PARTICIPANT_USER,
             });
 
             return;

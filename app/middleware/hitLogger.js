@@ -1,5 +1,5 @@
 const { appendFileSync, } = require(`fs`);
-const { HITLOGFILEURL, } = require('../../config');
+const { HIT_LOG_FILE_URL, } = require('../../config');
 
 /** Logs each hit to the API in local log file (link from config file)
  * @param {Request} req Express request object
@@ -7,7 +7,7 @@ const { HITLOGFILEURL, } = require('../../config');
  * @param {Function} next Express next function
  */
 function hitLogger(req, res, next) {
-    appendFileSync(HITLOGFILEURL,
+    appendFileSync(HIT_LOG_FILE_URL,
         `${Date.now()} ${req.method} ${req.originalUrl}\n`);
 
     next();

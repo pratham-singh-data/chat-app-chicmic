@@ -1,8 +1,9 @@
 module.exports = {
-    PORT: process.env.PORT,
-    SALT: process.env.SALT,
-    SECRETKEY: process.env.SECRETKEY,
-    MONGOURL: process.env.MONGOURL,
-    HITLOGFILEURL: `./database/logs/hits.log`,
-    ERRORLOGGERDIRECTORYURL: `./database/logs/errors`,
+    PORT: process.env.PORT ?? 8000,
+    SALT: process.env.SALT ?? `DEFAULT_SALT`,
+    SECRET_KEY: process.env.SECRET_KEY ?? `DEFAULT_KEY`,
+    // this must not work without a connected database
+    MONGO_URL: process.env.MONGO_URL,
+    HIT_LOG_FILE_URL: `./database/logs/hits.log`,
+    ERROR_LOGGER_DIRECTORY_URL: `./database/logs/errors`,
 };

@@ -4,7 +4,7 @@ const { generateLocalSendResponse, } = require('../helpers/responder');
 const { findFromUsersById, findOneInTokens, } = require('../services');
 const { VALIDTOKENNEEDED,
     CREDENTIALSCOULDNOTBEVERIFIED,
-    INVALIDTOKENTYPE, } = require('../util/messages');
+    INVALID_TOKENTYPE, } = require('../util/messages');
 
 /** Returns a token checking middleware function
  * @param {Array} types array of types of token to validate
@@ -47,7 +47,7 @@ function checkToken(...types) {
         if (! types.includes(tokenData.tokenType)) {
             localResponder({
                 statusCode: 403,
-                message: INVALIDTOKENTYPE,
+                message: INVALID_TOKENTYPE,
             });
 
             return;
