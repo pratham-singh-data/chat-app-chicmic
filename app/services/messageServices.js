@@ -2,7 +2,8 @@ const { MessageModel, } = require('../models');
 const { saveDocument,
     find,
     findById,
-    updateById, } = require('./operators/serviceOperators');
+    updateById,
+    deleteById, } = require('./operators/serviceOperators');
 
 /** Saves a document in messages model
  * @param {Object} doc Document to save
@@ -37,9 +38,17 @@ async function updateMessagesById(id, updateQuery) {
     return await updateById(MessageModel, id, updateQuery);
 }
 
+/** Deletes id element from messages model
+ * @param {String} id id of element to delete
+ */
+async function deleteFromMessagesById(id) {
+    await deleteById(MessageModel, id);
+}
+
 module.exports = {
     saveDocumentInMessages,
     findInMessages,
     findFromMessagesById,
     updateMessagesById,
+    deleteFromMessagesById,
 };

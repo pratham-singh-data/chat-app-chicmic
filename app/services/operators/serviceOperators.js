@@ -15,6 +15,16 @@ async function saveDocument(model, doc) {
     return await model(doc).save();
 };
 
+/** Deletes id element from given model
+ * @param {Model} model Mongoose compiled model
+ * @param {String} id id of element to delete
+ */
+async function deleteById(model, id) {
+    await model.deleteOne({
+        _id: id,
+    }).exec();
+}
+
 /** executes searchQuery on given model
  * @param {Model} model Mongoose compiled model
  * @param {Object} searchQuery search query to execute on collection
@@ -58,6 +68,7 @@ async function updateById(model, id, updateQuery) {
 module.exports = {
     runAggregate,
     saveDocument,
+    deleteById,
     findById,
     findOne,
     updateById,

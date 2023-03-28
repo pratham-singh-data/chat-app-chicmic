@@ -8,7 +8,8 @@ const { saveDocumentInChatrooms,
     updateChatroomById,
     findInMessages,
     findFromMessagesById,
-    updateMessagesById, } = require('../services');
+    updateMessagesById,
+    deleteFromMessagesById, } = require('../services');
 const { findFromUsersById, } = require('../services/userServices');
 const { NONEXISTENTUSER,
     DATASUCCESSFULLYCREATED,
@@ -17,7 +18,8 @@ const { NONEXISTENTUSER,
     NONEXISTENTCHATROOM,
     NONEXISTENTMESSAGE,
     MESSAGEDOESNOTBELONG,
-    DATASUCCESSFULLYUPDATED, } = require('../util/messages');
+    DATASUCCESSFULLYUPDATED,
+    DATASUCCESSFULLYDELETED, } = require('../util/messages');
 
 /** Registers a chatroom
  * @param {Request} req Express request object\
@@ -205,9 +207,59 @@ async function listMessage(req, res, next) {
     }
 }
 
+/** Deletes message in a chatroom
+ * @param {Request} req Express request object\
+ * @param {Response} res Express response object
+ * @param {Function} next Express next function
+ */
+async function deleteMessage(req, res, next) {
+    const localResponder = generateLocalSendResponse(res);
+    const token = req.headers.token;
+
+    try {
+        // get data of message
+        const messageData = await findFromMessagesById(req.params.id);
+
+        if (! messageData) {
+            localResponder({
+                statusCode: 404,
+                message: NONEXISTENTMESSAGE,
+            });
+
+            return;
+        }
+
+        // if current user is not the sender then do not delete
+        if (String(messageData.sender) !== token.id) {
+            localResponder({
+                statusCode: 403,
+                message: MESSAGEDOESNOTBELONG,
+            });
+
+            return;
+        }
+
+        await deleteFromMessagesById(req.params.id);
+        // deleted messages will remain in messages array of chatroom
+        // to tell which messages have been deleted
+
+        // send data to socket
+        const socket = io(`http://localhost:${PORT}`);
+        socket.emit(`deleted_message`, req.params.id, messageData.chatroom);
+
+        return localResponder({
+            statusCode: 200,
+            message: DATASUCCESSFULLYDELETED,
+        });
+    } catch (err) {
+        return next(err);
+    }
+}
+
 module.exports = {
     registerRoom,
     sendMessage,
     listMessage,
     updateMessage,
+    deleteMessage,
 };

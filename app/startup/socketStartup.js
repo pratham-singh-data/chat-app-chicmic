@@ -15,6 +15,10 @@ function socketStartup(io) {
             socket.to(chatroom).emit(`updated_message`, content);
         });
 
+        socket.on(`deleted_message`, (content, chatroom) => {
+            socket.to(chatroom).emit(`deleted_message`, content);
+        });
+
         socket.on(`unsubscribe`, (room) => {
             socket.leave(room);
         });

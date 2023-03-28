@@ -10,6 +10,7 @@ module.exports = {
     NONEXISTENTENDPOINT: `This endpoint does not exist.`,
     DATASUCCESSFULLYCREATED: `Data successfully created`,
     DATASUCCESSFULLYUPDATED: `Data successfully updated`,
+    DATASUCCESSFULLYDELETED: `Data successfully deleted`,
     PARTNERCANNOTBESELF: `Partner cannot be self.`,
     NONPARTICIPANTUSER: `You are not a participant in this chatroom.`,
     MESSAGEDOESNOTBELONG: `Given message does not belong to the current user.`,
