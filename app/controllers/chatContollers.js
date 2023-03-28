@@ -67,6 +67,68 @@ async function registerRoom(req, res, next) {
     }
 }
 
+/** List messages in a chatroom; id from params
+ * @param {Request} req Express request object\
+ * @param {Response} res Express response object
+ * @param {Function} next Express next function
+ */
+async function listMessage(req, res, next) {
+    try {
+        const data = await findInMessages({
+            chatroom: req.params.id,
+        });
+
+        sendResponse(res, {
+            statusCode: 200,
+            data,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+/** Reads data of a chatroom
+ * @param {Request} req Express request object\
+ * @param {Response} res Express response object
+ * @param {Function} next Express next function
+ */
+async function readChatroom(req, res, next) {
+    const localResponder = generateLocalSendResponse(res);
+    const token = req.headers.token;
+
+    try {
+        // check if the current user is a participant in this
+        // chatroom and that the chatroom exists
+        const chatroomData = await findFromChatroomsById(req.params.id);
+
+        if (! chatroomData) {
+            localResponder({
+                statusCode: 403,
+                message: NON_EXISTENT_CHATROOM,
+            });
+
+            return;
+        }
+
+        if (String(chatroomData.participant1) !== token.id &&
+                String(chatroomData.participant2) !== token.id) {
+            localResponder({
+                statusCode: 401,
+                message: NON_PARTICIPANT_USER,
+            });
+
+            return;
+        }
+
+        sendResponse(res, {
+            statusCode: 200,
+            data: chatroomData,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
 /** Sends message in a chatroom
  * @param {Request} req Express request object\
  * @param {Response} res Express response object
@@ -187,26 +249,6 @@ async function updateMessage(req, res, next) {
     }
 }
 
-/** List messages in a chatroom; id from params
- * @param {Request} req Express request object\
- * @param {Response} res Express response object
- * @param {Function} next Express next function
- */
-async function listMessage(req, res, next) {
-    try {
-        const data = await findInMessages({
-            chatroom: req.params.id,
-        });
-
-        sendResponse(res, {
-            statusCode: 200,
-            data,
-        });
-    } catch (err) {
-        next(err);
-    }
-}
-
 /** Deletes message in a chatroom
  * @param {Request} req Express request object\
  * @param {Response} res Express response object
@@ -256,53 +298,11 @@ async function deleteMessage(req, res, next) {
     }
 }
 
-/** Reads data of a chatroom
- * @param {Request} req Express request object\
- * @param {Response} res Express response object
- * @param {Function} next Express next function
- */
-async function readChatroom(req, res, next) {
-    const localResponder = generateLocalSendResponse(res);
-    const token = req.headers.token;
-
-    try {
-        // check if the current user is a participant in this
-        // chatroom and that the chatroom exists
-        const chatroomData = await findFromChatroomsById(req.params.id);
-
-        if (! chatroomData) {
-            localResponder({
-                statusCode: 403,
-                message: NON_EXISTENT_CHATROOM,
-            });
-
-            return;
-        }
-
-        if (String(chatroomData.participant1) !== token.id &&
-                String(chatroomData.participant2) !== token.id) {
-            localResponder({
-                statusCode: 401,
-                message: NON_PARTICIPANT_USER,
-            });
-
-            return;
-        }
-
-        sendResponse(res, {
-            statusCode: 200,
-            data: chatroomData,
-        });
-    } catch (err) {
-        next(err);
-    }
-}
-
 module.exports = {
     registerRoom,
-    sendMessage,
     listMessage,
+    readChatroom,
+    sendMessage,
     updateMessage,
     deleteMessage,
-    readChatroom,
 };

@@ -1,5 +1,5 @@
 const { verify, } = require('jsonwebtoken');
-const { SECRETKEY, } = require('../../config');
+const { SECRET_KEY, } = require('../../config');
 const { findOneInTokens, findFromUsersById, } = require('../services');
 const { INVALID_TOKEN, NON_EXISTENT_USER, } = require('../util/messages');
 const { generateLocalSendResponse, } = require('./responder');
@@ -52,7 +52,7 @@ function checkToken(...types) {
 
         // check that it is not verified and update token in header
         try {
-            req.headers.token = verify(req.headers.token, SECRETKEY);
+            req.headers.token = verify(req.headers.token, SECRET_KEY);
         } catch (err) {
             localResponder({
                 statusCode: 400,

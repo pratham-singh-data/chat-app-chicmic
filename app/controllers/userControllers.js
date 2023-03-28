@@ -1,5 +1,6 @@
 const { sign, } = require('jsonwebtoken');
-const { SECRETKEY, } = require('../../config');
+const { io, } = require('socket.io-client');
+const { SECRET_KEY, SOCKET_URL, } = require('../../config');
 const { hashPassword, } = require('../helpers/hashPassword');
 const { generateLocalSendResponse,
     sendResponse, } = require('../helpers/responder');
@@ -43,7 +44,7 @@ async function signupUser(req, res, next) {
 
         const token = sign({
             id: savedData._id,
-        }, SECRETKEY, {
+        }, SECRET_KEY, {
             expiresIn: TOKEN_EXPIRY_TIME.TEMP,
         });
 
@@ -91,20 +92,33 @@ async function loginUser(req, res, next) {
 
         const token = sign({
             id: userData._id,
-        }, SECRETKEY, {
+        }, SECRET_KEY, {
             expiresIn: TOKEN_EXPIRY_TIME.LOGIN,
         });
 
-        await saveDocumentInTokens({
-            user: userData._id,
-            token,
-            tokenType: TOKEN_TYPES.LOGIN,
+        // register in token server
+        const socket = io(SOCKET_URL.INTERNAL);
+        socket.emit(`register`, token);
+
+        socket.on(`register_success`, async () => {
+            await saveDocumentInTokens({
+                user: userData._id,
+                token,
+                tokenType: TOKEN_TYPES.LOGIN,
+            });
+
+            localResponder({
+                statusCode: 200,
+                message: USER_SUCCESSFUL_LOGIN,
+                token,
+            });
         });
 
-        localResponder({
-            statusCode: 200,
-            message: USER_SUCCESSFUL_LOGIN,
-            token,
+        socket.on(`register_error`, async (message) => {
+            localResponder({
+                statusCode: 500,
+                message,
+            });
         });
     } catch (err) {
         next(err);
@@ -182,7 +196,7 @@ async function updateUser(req, res, next) {
                 id: token.id,
                 email: body.email,
                 oldEmail: userData.email,
-            }, SECRETKEY, {
+            }, SECRET_KEY, {
                 expiresIn: TOKEN_EXPIRY_TIME.TEMP,
             });
 
@@ -272,7 +286,7 @@ async function validateUserEmail(req, res, next) {
 
         const jwtToken = sign({
             id: userData._id,
-        }, SECRETKEY, {
+        }, SECRET_KEY, {
             expiresIn: TOKEN_EXPIRY_TIME.LOGIN,
         });
 
@@ -295,6 +309,31 @@ async function validateUserEmail(req, res, next) {
             user: userData._id,
             token: jwtToken,
             tokenType: TOKEN_TYPES.LOGIN,
+        });
+
+        // register in token server
+        const socket = io(SOCKET_URL.INTERNAL);
+        socket.emit(`register`, token);
+
+        socket.on(`register_success`, async () => {
+            await saveDocumentInTokens({
+                user: userData._id,
+                token,
+                tokenType: TOKEN_TYPES.LOGIN,
+            });
+
+            localResponder({
+                statusCode: 200,
+                message: USER_SUCCESSFUL_LOGIN,
+                token,
+            });
+        });
+
+        socket.on(`register_error`, async (message) => {
+            localResponder({
+                statusCode: 500,
+                message,
+            });
         });
 
         localResponder({

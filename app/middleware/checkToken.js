@@ -1,5 +1,5 @@
 const { verify, } = require('jsonwebtoken');
-const { SECRETKEY, } = require('../../config');
+const { SECRET_KEY, } = require('../../config');
 const { generateLocalSendResponse, } = require('../helpers/responder');
 const { findFromUsersById, findOneInTokens, } = require('../services');
 const { VALIDTOKENNEEDED,
@@ -54,7 +54,7 @@ function checkToken(...types) {
         }
 
         try {
-            req.headers.token = verify(req.headers.token, SECRETKEY);
+            req.headers.token = verify(req.headers.token, SECRET_KEY);
         } catch (err) {
             localResponder({
                 statusCode: 403,

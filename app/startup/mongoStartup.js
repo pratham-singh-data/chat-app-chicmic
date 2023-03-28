@@ -1,11 +1,10 @@
 const mongoose = require(`mongoose`);
-const { MONGOURL, } = require('../../config');
-
+const { MONGO_URL, } = require('../../config');
 /** Asyncronously connects to mongoose server
  */
 async function mongoConnect() {
-    await mongoose.connect(MONGOURL);
-    console.log(`Successfully connected to MongoDB at ${MONGOURL}`);
+    await mongoose.connect(MONGO_URL);
+    console.log(`Successfully connected to MongoDB at ${MONGO_URL}`);
 }
 
 module.exports = {
