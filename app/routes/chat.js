@@ -1,7 +1,8 @@
 const { Router, } = require('express');
 const { registerRoom,
     sendMessage,
-    updateMessage, } = require('../controllers/chatContollers');
+    updateMessage,
+    listMessage, } = require('../controllers/chatContollers');
 const { checkToken, } = require('../helpers/checkToken');
 const { validateBody, validateParams, } = require('../middleware/validators');
 const { TOKENTYPES, } = require('../util/constants');
@@ -16,6 +17,11 @@ chatroomRouter.post(`/`,
     checkToken(TOKENTYPES.LOGIN),
     validateBody(registerRoomSchema),
     registerRoom);
+
+chatroomRouter.get(`/:id`,
+    checkToken(TOKENTYPES.LOGIN),
+    validateParams(soleIdSchema),
+    listMessage);
 
 chatroomRouter.post(`/messages/:id`,
     checkToken(TOKENTYPES.LOGIN),

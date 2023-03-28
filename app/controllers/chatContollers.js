@@ -1,6 +1,7 @@
 const { io, } = require('socket.io-client');
 const { PORT, } = require('../../config');
-const { generateLocalSendResponse, } = require('../helpers/responder');
+const { generateLocalSendResponse,
+    sendResponse, } = require('../helpers/responder');
 const { saveDocumentInChatrooms,
     saveDocumentInMessages,
     findFromChatroomsById,
@@ -195,7 +196,7 @@ async function listMessage(req, res, next) {
             chatroom: req.params.id,
         });
 
-        sendMessage(res, {
+        sendResponse(res, {
             statusCode: 200,
             data,
         });
