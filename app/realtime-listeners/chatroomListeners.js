@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const { verify, } = require('jsonwebtoken');
 const { isValidObjectId, } = require('mongoose');
 const { SECRET_KEY, } = require('../../config');
@@ -16,7 +17,9 @@ const { NON_PARTICIPANT_USER,
     SUCCESSFULLY_SUBSCRIBED,
     INVALID_OPERATION,
     DATA_SUCCESSFULLY_UPDATED,
-    DATA_SUCCESSFULLY_DELETED, } = require('../util/messages');
+    DATA_SUCCESSFULLY_DELETED,
+    ERROR_UPDATING_DATABASE, } = require('../util/messages');
+const { deleteMessageSchema, updateMessageSchema, } = require('../validators');
 
 /** Subscribe the goiven socket to the given room
  * @param {Socket} socket Socket.io socket
@@ -80,6 +83,16 @@ async function subscribeSocket(socket, sessionTokens, room, ack) {
  * @param {Function} ack Acknowledgement function
  */
 async function sendMessage(socket, sessionTokens, data, ack) {
+    try {
+        data = Joi.attempt(data, updateMessageSchema);
+    } catch (err) {
+        ack(false, {
+            message: err.message,
+        });
+
+        return;
+    }
+
     const { chatroom, content, } = data;
     const token = socket.handshake.auth.token;
 
@@ -146,6 +159,16 @@ async function sendMessage(socket, sessionTokens, data, ack) {
  * @param {Function} ack Acknowledgement function
  */
 async function updateMessage(socket, sessionTokens, data, ack) {
+    try {
+        data = Joi.attempt(data, updateMessageSchema);
+    } catch (err) {
+        ack(false, {
+            message: err.message,
+        });
+
+        return;
+    }
+
     const { chatroom, content, messageId, } = data;
 
     const token = socket.handshake.auth.token;
@@ -211,6 +234,18 @@ async function updateMessage(socket, sessionTokens, data, ack) {
  * @param {Function} ack Acknowledgement function
  */
 async function deleteMessage(socket, sessionTokens, data, ack) {
+    try {
+        data = Joi.attempt(data, deleteMessageSchema);
+    } catch (err) {
+        ack(false, {
+            message: err.message,
+        });
+
+        return;
+    }
+
+    console.log(data);
+
     const { chatroom, messageId, } = data;
 
     const token = socket.handshake.auth.token;
@@ -251,16 +286,23 @@ async function deleteMessage(socket, sessionTokens, data, ack) {
     const allowed = await checkMessageUpdateValidity(tokenData, messageId);
 
     if (allowed) {
-        await deleteFromMessagesById(messageId);
+        try {
+            await deleteFromMessagesById(messageId);
 
-        // data will remain in chatroom messages array
-        // in order to mark them as missing / deleted
+            // data will remain in chatroom messages array
+            // in order to mark them as missing / deleted
 
-        socket.to(chatroom).emit(`deleted_message`, data);
+            socket.to(chatroom).emit(`deleted_message`, data);
 
-        ack(true, {
-            message: DATA_SUCCESSFULLY_DELETED,
-        });
+            ack(true, {
+                message: DATA_SUCCESSFULLY_DELETED,
+            });
+        } catch (err) {
+            ack(false, {
+                message: ERROR_UPDATING_DATABASE,
+                error: err,
+            });
+        }
     } else {
         ack(false, {
             message: INVALID_OPERATION,

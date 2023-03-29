@@ -4,6 +4,9 @@ const { paginationSchema, } = require(`./paginationSchema`);
 const { registerRoomSchema, } = require(`./registerRoomSchema`);
 const { messageSchema, } = require(`./messageSchema`);
 const { soleIdSchema, } = require(`./soleIdSchema`);
+const { deleteMessageSchema, } = require(`./deleteMessageSchema`);
+const { updateMessageSchema, } = require(`./updateMessageSchema`);
+const { sendMessageSchema, } = require(`./sendMessageSchema`);
 
 module.exports = {
     signupSchema,
@@ -12,4 +15,7 @@ module.exports = {
     registerRoomSchema,
     messageSchema,
     soleIdSchema,
+    deleteMessageSchema,
+    updateMessageSchema,
+    sendMessageSchema,
 };

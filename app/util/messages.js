@@ -17,4 +17,5 @@ module.exports = {
     SUCCESSFULLY_SUBSCRIBED: `Successfully subscibed to room`,
     TOKEN_ALREADY_REGISTERED: `This token is already registered.`,
     INVALID_OPERATION: `Invalid operation detected`,
+    ERROR_UPDATING_DATABASE: `Error updating database.`,
 };
