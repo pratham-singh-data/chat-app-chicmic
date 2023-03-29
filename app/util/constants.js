@@ -1,5 +1,4 @@
 module.exports = {
-    OBJECTID_REGEX: /^[0-9a-fA-F]{24}$/,
     STRING_LENGTH_MIN: 0,
     STRING_LENGTH_MAX: {
         NORMAL: 1000,
