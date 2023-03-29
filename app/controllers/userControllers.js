@@ -1,6 +1,5 @@
 const { sign, } = require('jsonwebtoken');
-const { io, } = require('socket.io-client');
-const { SECRET_KEY, SOCKET_URL, } = require('../../config');
+const { SECRET_KEY, } = require('../../config');
 const { hashPassword, } = require('../helpers/hashPassword');
 const { generateLocalSendResponse,
     sendResponse, } = require('../helpers/responder');
@@ -297,10 +296,6 @@ async function validateUserEmail(req, res, next) {
             token: jwtToken,
             tokenType: TOKEN_TYPES.LOGIN,
         });
-
-        // register in token server
-        const socket = io(SOCKET_URL.INTERNAL);
-        socket.emit(`register`, token);
 
         await saveDocumentInTokens({
             user: userData._id,
