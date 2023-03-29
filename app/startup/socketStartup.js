@@ -1,5 +1,6 @@
 const { subscribeSocket,
-    sendMessage, } = require('../realtime-listeners/chatroomListeners');
+    sendMessage,
+    updateMessage, } = require('../realtime-listeners/chatroomListeners');
 const { registerToken, } = require('../realtime-listeners/userListeners');
 
 /** Startup activities of socket io server application\
@@ -23,9 +24,8 @@ function socketStartup(io) {
         socket.on(`new_message`,
             sendMessage.bind(undefined, socket, sessionTokens));
 
-        // socket.on(`updated_message`, (content, chatroom) => {
-        //     socket.to(chatroom).emit(`updated_message`, content);
-        // });
+        socket.on(`updated_message`,
+            updateMessage.bind(undefined, socket, sessionTokens));
 
         // socket.on(`deleted_message`, (content, chatroom) => {
         //     socket.to(chatroom).emit(`deleted_message`, content);

@@ -8,7 +8,13 @@ const { findFromChatroomsById, } = require('../services');
 async function confirmChatroomValidity(token, room) {
     // check if the current user is a participant in this
     // chatroom and that the chatroom exists
-    const chatroomData = await findFromChatroomsById(room);
+    let chatroomData;
+
+    try {
+        chatroomData = await findFromChatroomsById(room);
+    } catch (err) {
+        return false;
+    }
 
     if (! chatroomData) {
         return false;

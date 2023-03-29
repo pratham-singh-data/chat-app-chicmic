@@ -18,4 +18,6 @@ module.exports = {
     TOKEN_REGISTERED: `Token successfully registerred`,
     TOKEN_NOT_REGISTERED: `Token cannot be registerred`,
     SUCCESSFULLY_SUBSCRIBED: `Successfully subscibed to room`,
+    TOKEN_ALREADY_REGISTERED: `This token is already registered.`,
+    INVALID_OPERATION: `Invalid operation detected`,
 };

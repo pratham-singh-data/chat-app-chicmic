@@ -21,12 +21,6 @@ chatroomRouter.get(`/messages/:id`,
     validateParams(soleIdSchema),
     listMessage);
 
-// chatroomRouter.post(`/messages/:id`,
-//     checkToken(TOKEN_TYPES.LOGIN),
-//     validateParams(soleIdSchema),
-//     validateBody(messageSchema),
-//     sendMessage);
-
 // chatroomRouter.delete(`/messages/:id`,
 //     checkToken(TOKEN_TYPES.LOGIN),
 //     validateParams(soleIdSchema),
