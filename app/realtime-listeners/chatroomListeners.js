@@ -19,7 +19,9 @@ const { NON_PARTICIPANT_USER,
     DATA_SUCCESSFULLY_UPDATED,
     DATA_SUCCESSFULLY_DELETED,
     ERROR_UPDATING_DATABASE, } = require('../util/messages');
-const { deleteMessageSchema, updateMessageSchema, } = require('../validators');
+const { deleteMessageSchema,
+    updateMessageSchema,
+    sendMessageSchema, } = require('../validators');
 
 /** Subscribe the goiven socket to the given room
  * @param {Socket} socket Socket.io socket
@@ -84,7 +86,7 @@ async function subscribeSocket(socket, sessionTokens, room, ack) {
  */
 async function sendMessage(socket, sessionTokens, data, ack) {
     try {
-        data = Joi.attempt(data, updateMessageSchema);
+        data = Joi.attempt(data, sendMessageSchema);
     } catch (err) {
         ack(false, {
             message: err.message,
@@ -243,8 +245,6 @@ async function deleteMessage(socket, sessionTokens, data, ack) {
 
         return;
     }
-
-    console.log(data);
 
     const { chatroom, messageId, } = data;
 

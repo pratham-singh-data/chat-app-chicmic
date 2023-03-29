@@ -299,14 +299,8 @@ async function validateUserEmail(req, res, next) {
 
         await saveDocumentInTokens({
             user: userData._id,
-            token,
+            token: jwtToken,
             tokenType: TOKEN_TYPES.LOGIN,
-        });
-
-        localResponder({
-            statusCode: 200,
-            message: USER_SUCCESSFUL_LOGIN,
-            token,
         });
 
         localResponder({
