@@ -96,29 +96,16 @@ async function loginUser(req, res, next) {
             expiresIn: TOKEN_EXPIRY_TIME.LOGIN,
         });
 
-        // register in token server
-        const socket = io(SOCKET_URL.INTERNAL);
-        socket.emit(`register`, token);
-
-        socket.on(`register_success`, async () => {
-            await saveDocumentInTokens({
-                user: userData._id,
-                token,
-                tokenType: TOKEN_TYPES.LOGIN,
-            });
-
-            localResponder({
-                statusCode: 200,
-                message: USER_SUCCESSFUL_LOGIN,
-                token,
-            });
+        await saveDocumentInTokens({
+            user: userData._id,
+            token,
+            tokenType: TOKEN_TYPES.LOGIN,
         });
 
-        socket.on(`register_error`, async (message) => {
-            localResponder({
-                statusCode: 500,
-                message,
-            });
+        localResponder({
+            statusCode: 200,
+            message: USER_SUCCESSFUL_LOGIN,
+            token,
         });
     } catch (err) {
         next(err);
@@ -315,25 +302,16 @@ async function validateUserEmail(req, res, next) {
         const socket = io(SOCKET_URL.INTERNAL);
         socket.emit(`register`, token);
 
-        socket.on(`register_success`, async () => {
-            await saveDocumentInTokens({
-                user: userData._id,
-                token,
-                tokenType: TOKEN_TYPES.LOGIN,
-            });
-
-            localResponder({
-                statusCode: 200,
-                message: USER_SUCCESSFUL_LOGIN,
-                token,
-            });
+        await saveDocumentInTokens({
+            user: userData._id,
+            token,
+            tokenType: TOKEN_TYPES.LOGIN,
         });
 
-        socket.on(`register_error`, async (message) => {
-            localResponder({
-                statusCode: 500,
-                message,
-            });
+        localResponder({
+            statusCode: 200,
+            message: USER_SUCCESSFUL_LOGIN,
+            token,
         });
 
         localResponder({

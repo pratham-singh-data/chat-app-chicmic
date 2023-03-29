@@ -15,5 +15,7 @@ module.exports = {
     NON_PARTICIPANT_USER: `You are not a participant in this chatroom.`,
     MESSAGE_DOES_NOT_BELONG:
         `Given message does not belong to the current user.`,
+    TOKEN_REGISTERED: `Token successfully registerred`,
     TOKEN_NOT_REGISTERED: `Token cannot be registerred`,
+    SUCCESSFULLY_SUBSCRIBED: `Successfully subscibed to room`,
 };
