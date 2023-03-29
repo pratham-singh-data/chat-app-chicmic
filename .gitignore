@@ -1,4 +1,5 @@
 /node_modules
 /database
+/frontend
 .env
 index.html

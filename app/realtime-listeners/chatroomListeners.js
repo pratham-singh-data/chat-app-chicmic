@@ -17,23 +17,16 @@ const { NON_PARTICIPANT_USER,
  * @param {Function} ack Acknowledgement Function
  */
 async function subscribeSocket(socket, sessionTokens, room, ack) {
-    console.log(room, ack);
-    // if already joined; don't bother
-    if (sessionTokens[socket.handshake.auth.token][room]) {
-        ack(true, SUCCESSFULLY_SUBSCRIBED);
+    // user is not registered if they
+    // are not in the sessionTokens object
+    if (! sessionTokens[socket.handshake.auth.token]) {
+        ack(false, INVALID_TOKEN);
         return;
     }
 
     // check that room is valid
     if (! isValidObjectId(room)) {
         ack(false, NON_EXISTENT_CHATROOM);
-        return;
-    }
-
-    // user is not registered if they
-    // are not in the sessionTokens object
-    if (! sessionTokens[socket.handshake.auth.token]) {
-        ack(false, INVALID_TOKEN);
         return;
     }
 
@@ -58,7 +51,6 @@ async function subscribeSocket(socket, sessionTokens, room, ack) {
         console.log(sessionTokens);
 
         ack(true, SUCCESSFULLY_SUBSCRIBED);
-        socket.emit(`subscribe_success`);
     } else {
         ack(false, NON_PARTICIPANT_USER);
     }
@@ -71,19 +63,17 @@ async function subscribeSocket(socket, sessionTokens, room, ack) {
  * @param {Function} ack Acknowledgement function
  */
 async function sendMessage(socket, sessionTokens, data, ack) {
-    // console.log(ack, chatroom, content);
     const { chatroom, content, } = data;
+    const token = socket.handshake.auth.token;
 
     // if user is not sending a token stop
-    if (! socket.handshake.auth.token) {
+    if (! token || ! sessionTokens[token]) {
         ack(false, INVALID_TOKEN);
         return;
     }
 
-    const token = socket.handshake.auth.token;
-
     // check that the current user is in this chatroom
-    if (! sessionTokens[token] || ! sessionTokens[token][chatroom]) {
+    if (! sessionTokens[token][chatroom]) {
         ack(false, NON_PARTICIPANT_USER);
         return;
     }
@@ -102,6 +92,7 @@ async function sendMessage(socket, sessionTokens, data, ack) {
         return;
     }
 
+    // data may be saved later
     (async () => {
         saveDocumentInMessages({
             sender: tokenData.id,
@@ -114,7 +105,7 @@ async function sendMessage(socket, sessionTokens, data, ack) {
 
     console.log(socket.rooms, chatroom);
 
-    socket.to(chatroom).emit(`new_message`, { chatroom, content, });
+    socket.to(chatroom).emit(`new_message`, data);
 }
 
 module.exports = {

@@ -11,9 +11,8 @@ function socketStartup(io) {
 
     // for user connection
     io.of(`/user`).on(`connection`, (socket) => {
-        socket.emit(`1`);
         socket.on(`register`,
-            registerToken.bind(undefined, socket, sessionTokens));
+            registerToken.bind(undefined, sessionTokens));
     });
 
     // for chatrooms

@@ -8,12 +8,11 @@ const { TOKEN_NOT_REGISTERED,
     NON_EXISTENT_USER, } = require('../util/messages');
 
 /** Registers a token in sessionTokens
- * @param {Socket} socket Socket.io socket
  * @param {Object} sessionTokens Object conatining tokens in current session
  * @param {String} token JWT token to register
  * @param {Function} ack Acknowledgement Function
  */
-async function registerToken(socket, sessionTokens, token, ack) {
+async function registerToken(sessionTokens, token, ack) {
     // check that a token was sent
     if (! token) {
         ack(false, INVALID_TOKEN);
