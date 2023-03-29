@@ -70,7 +70,6 @@ async function registerToken(sessionTokens, token, ack) {
     }
 
     sessionTokens[token] = {};
-    console.log(sessionTokens);
 
     ack(true, TOKEN_REGISTERED);
 }

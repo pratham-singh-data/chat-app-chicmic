@@ -7,14 +7,16 @@ const { confirmChatroomValidity, } =
     require('../helpers/confirmChatroomValidity');
 const { saveDocumentInMessages,
     updateMessagesById,
-    updateChatroomById, } = require('../services');
+    updateChatroomById,
+    deleteFromMessagesById, } = require('../services');
 const { NON_PARTICIPANT_USER,
     NON_EXISTENT_CHATROOM,
     INVALID_TOKEN,
     DATA_SUCCESSFULLY_CREATED,
     SUCCESSFULLY_SUBSCRIBED,
     INVALID_OPERATION,
-    DATA_SUCCESSFULLY_UPDATED, } = require('../util/messages');
+    DATA_SUCCESSFULLY_UPDATED,
+    DATA_SUCCESSFULLY_DELETED, } = require('../util/messages');
 
 /** Subscribe the goiven socket to the given room
  * @param {Socket} socket Socket.io socket
@@ -60,7 +62,6 @@ async function subscribeSocket(socket, sessionTokens, room, ack) {
         socket.join(room);
 
         sessionTokens[socket.handshake.auth.token][room] = Date.now();
-        console.log(sessionTokens);
 
         ack(true, {
             message: SUCCESSFULLY_SUBSCRIBED,
@@ -185,7 +186,6 @@ async function updateMessage(socket, sessionTokens, data, ack) {
     const allowed = await checkMessageUpdateValidity(tokenData, messageId);
 
     if (allowed) {
-        console.log(messageId, content);
         await updateMessagesById(messageId, {
             $set: {
                 text: content,
@@ -204,8 +204,73 @@ async function updateMessage(socket, sessionTokens, data, ack) {
     }
 }
 
+/** Deletes a message in this chatroom
+ * @param {Socket} socket Socket.io socket
+ * @param {Object} sessionTokens Object conatining tokens in current session
+ * @param {Object} data Object with chatroom and content data
+ * @param {Function} ack Acknowledgement function
+ */
+async function deleteMessage(socket, sessionTokens, data, ack) {
+    const { chatroom, messageId, } = data;
+
+    const token = socket.handshake.auth.token;
+
+    // if user is not sending a token stop
+    if (! token || ! sessionTokens[token]) {
+        ack(false, {
+            message: INVALID_TOKEN,
+        });
+        return;
+    }
+
+    // check that the current user is in this chatroom
+    if (! sessionTokens[token][chatroom]) {
+        ack(false, {
+            message: NON_PARTICIPANT_USER,
+        });
+        return;
+    }
+
+    // invalid tokens will not pass the above step
+    // so no need to verify
+
+    // if token is in session tokens then it is assumed
+    // that it belongs to a valid user
+    // expiration is the only thing that is handled
+    let tokenData;
+
+    try {
+        tokenData = verify(socket.handshake.auth.token, SECRET_KEY);
+    } catch (err) {
+        ack(false, {
+            message: INVALID_TOKEN,
+        });
+        return;
+    }
+
+    const allowed = await checkMessageUpdateValidity(tokenData, messageId);
+
+    if (allowed) {
+        await deleteFromMessagesById(messageId);
+
+        // data will remain in chatroom messages array
+        // in order to mark them as missing / deleted
+
+        socket.to(chatroom).emit(`deleted_message`, data);
+
+        ack(true, {
+            message: DATA_SUCCESSFULLY_DELETED,
+        });
+    } else {
+        ack(false, {
+            message: INVALID_OPERATION,
+        });
+    }
+}
+
 module.exports = {
     subscribeSocket,
     sendMessage,
     updateMessage,
+    deleteMessage,
 };
