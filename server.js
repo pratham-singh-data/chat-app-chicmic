@@ -26,8 +26,8 @@ startupActivites().then(() => {
 });
 
 // ! REMOVE THIS
-app.get(`/frontend`, (req, res) => {
-    res.sendFile(__dirname + '/frontend/index.html');
+app.get(`/frontend`, (req) => {
+    req.res.sendFile(__dirname + '/frontend/index.html');
 });
 
 process.on(`uncaughtException`, loggingErrorHandler);
